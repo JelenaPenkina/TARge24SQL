@@ -6,7 +6,7 @@ crEaTE database TARge24
 use TARge24
 
 -- db kustutamine
-drop database TARge24
+-- drop database TARge24
 
 -- 2tund 05.03.2025
 
@@ -334,3 +334,81 @@ SELECT Name, Gender, Salary, DepartmentName FROM Employees
 left join Department
 ON Employees.DepartmentId = Department.Id 
 WHERE Employees.DepartmentId is NULL
+
+
+
+--4 tund 19.03.2025
+-- teine variant
+SELECT name, gender, salary, DepartmentName FROM Employees 
+left join Department on Employees.DepartmentId = Department.Id WHERE 
+Department.Id is null
+
+--Kuidas saame Deparment tabelsi oleva rea, kus on null 
+SELECT Name, Gender, Salary DepartmentName FROM Employees RIGHT JOIN Department ON 
+Employees.DepartmentId = Department.Id WHERE Employees.DepartmentId is NULL 
+
+--full join
+--mõlema tabeli mitte kattuvate väärtustega read kuvab välja
+SELECT Name, gender, salary DepartmentName FROM Employees FULL JOIN Department ON 
+Employees.DepartmentId = Department.Id WHERE Employees.DepartmentId is NULL OR Department.ID IS NULL
+
+--muudame tabeli nimetus , alguses vana tabeli nimi ja siis uus soovitud
+SP_RENAME 'Department123', ' Department'
+
+--left join, e employees tabel nimetuse on lühendina: E
+SELECT Name, gender, salary, DEpartmentName FROM Employees E
+left join Department on E.DepartmentId = Department.id WHERE Department.id is NULL
+
+select E.Name as Employee, M.Name as Manager
+from Employees E left join Employees M ON E.ManagerId = M.Id
+
+ALTER TABLE Employees ADD ManagerId int 
+
+--inner join
+--kuvab ainult ManagerId all olevate isikute väärtuseid
+SELECT E.Name AS Employee, M.Name AS Manager FROM Employees E INNER JOIN Employees M ON E.ManagerId = M.Id
+
+--cross join
+--- kõik saavad kõikide ülemused olla
+select E.Name AS Employee, M.Name as Manager
+from Employees E cross join Employees AS M
+
+SELECT ISNULL('Asd', 'No manager') as Manager
+
+--NULL asemel kuvab No Manager
+SELECT COALESCE(NULL, 'No Manager')as Manager
+
+-- neil kellel ei ole ülemust, siis paneb neile No Manager väärtuse 
+SELECT E.Name AS Employee, IS`NULL(M.Name, 'No Manager') as Manager
+FROM Employees E
+left join Employees M
+on E.ManagerId = M.Id
+
+--teeme päringu, kus kasutame case-i
+SELECT E.Name as Employee, CASE WHEN M.Name IS NULL THEN 'No Manager'
+ELSE M.Name end as Manager
+FROM Employees E
+LEFT JOIN Employees M
+ON E.ManagerId = M.Id
+
+--lisame tabelisse uued veerud 
+alter table Employees
+add MiddleName nvarchar(30)
+alter table Employees
+add LastName nvarchar(30)
+
+
+--muudame veeru nime 
+SP_RENAME 'Employees.Name', 'FirstName'
+
+INSERT INTO Employees VALUES 
+(1, 'Tom', 'Nick', 'Jones', 'Male', 4000, 1, NULL),
+(2, 'Pam', NULL, 'Anderson', 'Female', 3000, 3, 1),
+(3, 'John', NULL, NULL, 'Male', 3500, 1, 1),
+(4, 'Sam', NULL, 'Smith', 'Male', 4500, 2, 1),
+(5, NULL, 'Todd', 'Someone', 'Male', 2800, 2, 2),
+(6, 'Ben', 'Ten', 'Sven', 'Male', 7000, 1, 2),
+(7, 'sara', 'NULL', 'Connor', 'Female', 4800, 3, 3),
+(8, 'Valarie', 'Balerine', NULL, 'Female', 5500, 1, 3),
+(9, 'James', '007', 'Bond', 'Male', 6500, NULL, 3),
+(10, NULL, NULL, 'Crowe', 'Male', 8800, NULL, 4)
